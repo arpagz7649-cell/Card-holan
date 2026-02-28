@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROBOT BATTLE: OON EDITION</title>
+    <style>
+        body { background: #0a0a0a; color: #00ffff; font-family: 'Courier New', monospace; text-align: center; margin: 0; padding: 20px; }
+        h1 { color: #ffeb3b; text-transform: uppercase; border-bottom: 2px dashed #00ffff; padding-bottom: 10px; }
+        
+        .grid-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 20px; }
+        
+        .card { 
+            background: #111; border: 2px solid #00ffff; border-radius: 10px; width: 40%; 
+            padding: 15px; cursor: pointer; transition: 0.3s; 
+        }
+        .card:hover { background: #00ffff; color: #000; transform: scale(1.05); }
+        .card.active { background: #ffeb3b; color: #000; border-color: #ffeb3b; }
+        
+        .symbol { font-size: 50px; margin-bottom: 10px; }
+        .title { font-weight: bold; font-size: 18px; }
+        .desc { font-size: 12px; margin-top: 5px; }
+
+        .status-box { margin-top: 30px; padding: 15px; border: 2px solid #ff003c; color: #ff003c; font-weight: bold; font-size: 20px; }
+
+        .btn-container { margin-top: 20px; display: flex; justify-content: center; gap: 10px; }
+        .btn { 
+            padding: 15px 20px; font-size: 16px; font-weight: bold; cursor: pointer; 
+            border: none; border-radius: 5px; text-transform: uppercase;
+        }
+        .btn-host { background: #ff003c; color: #fff; }
+        .btn-join { background: #00ffff; color: #000; }
+        .btn:hover { opacity: 0.8; }
+    </style>
+</head>
+<body>
+
+    <h1>⚙️ ROBOT BATTLE MABAR ⚙️</h1>
+    <p>Sistem Tempur "Out of the Box" - Jalur Hotspot</p>
+
+    <h3>PILIH FAKSI MESIN MASTER:</h3>
+
+    <div class="grid-container">
+        <div class="card" id="card-spade" onclick="pilihRobot('♠ FISIKA', 'card-spade')">
+            <div class="symbol">♠</div>
+            <div class="title">FISIKA (Attacker)</div>
+            <div class="desc">Gaya, Kecepatan Mutlak & Tabrakan Presisi</div>
+        </div>
+        
+        <div class="card" id="card-diamond" onclick="pilihRobot('♦ KIMIA', 'card-diamond')">
+            <div class="symbol">♦</div>
+            <div class="title">KIMIA (Defender)</div>
+            <div class="desc">Armor Berlian & Reaksi Molekul Keras</div>
+        </div>
+
+        <div class="card" id="card-heart" onclick="pilihRobot('♥ BIOLOGI', 'card-heart')">
+            <div class="symbol">♥</div>
+            <div class="title">BIOLOGI (Healer)</div>
+            <div class="desc">Regenerasi Sel Buatan & Penyembuhan</div>
+        </div>
+
+        <div class="card" id="card-club" onclick="pilihRobot('♣ CAUSAL ENGINEER', 'card-club')">
+            <div class="symbol">♣</div>
+            <div class="title">ENGINEER (Taktis)</div>
+            <div class="desc">Jebakan Maut & Manipulasi Gravitasi</div>
+        </div>
+    </div>
+
+    <div class="status-box" id="statusPilihan">
+        STATUS: BELUM ADA ROBOT TERPILIH
+    </div>
+
+    <div class="btn-container">
+        <button class="btn btn-host" onclick="buatRoom()">📡 BUAT ROOM (HOST)</button>
+        <button class="btn btn-join" onclick="gabungRoom()">🔗 GABUNG (GUEST)</button>
+    </div>
+
+    <script>
+        let robotJagoan = "";
+
+        function pilihRobot(namaRobot, idCard) {
+            robotJagoan = namaRobot;
+            
+            // Reset semua warna kartu
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+            
+            // Beri warna khusus pada kartu yang dipilih
+            document.getElementById(idCard).classList.add('active');
+            
+            // Update layar status
+            document.getElementById('statusPilihan').innerText = "SIAP TEMPUR: " + namaRobot;
+            document.getElementById('statusPilihan').style.borderColor = "#00ffff";
+            document.getElementById('statusPilihan').style.color = "#00ffff";
+        }
+
+        function buatRoom() {
+            if(!robotJagoan) {
+                alert("Master Oon! Pilih robotnya dulu sebelum buka Hotspot!");
+                return;
+            }
+            alert("Membuka Sinyal Udara... Menunggu lawan gabung untuk dihabisi oleh " + robotJagoan + "!");
+        }
+
+        function gabungRoom() {
+            if(!robotJagoan) {
+                alert("Master Oon! Pilih robotnya dulu sebelum numpang Hotspot!");
+                return;
+            }
+            let kodeIP = prompt("Masukkan Kode Hotspot Host:");
+            if(kodeIP) {
+                alert("Sistem " + robotJagoan + " sedang menyambungkan ke arena " + kodeIP + "...");
+            }
+        }
+    </script>
+</body>
+      </html>
+      
