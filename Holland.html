@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CARD GAME HOLLAND - ROBOT BATTLE</title>
+    <style>
+        body { background: #050505; color: #00ff00; font-family: 'Courier New', monospace; text-align: center; padding: 20px; }
+        .box-utama { border: 2px solid #00ff00; padding: 20px; border-radius: 15px; background: #111; }
+        .faksi-container { display: flex; justify-content: center; gap: 10px; margin: 20px 0; }
+        .kartu { 
+            border: 1px solid #00ff00; padding: 10px; width: 60px; cursor: pointer; 
+            font-size: 30px; border-radius: 8px; transition: 0.3s;
+        }
+        .kartu:hover { background: #00ff00; color: #000; }
+        .terpilih { background: #fff; color: #000; border-color: #fff; transform: scale(1.1); }
+        
+        .input-room { 
+            background: #000; border: 1px solid #00ff00; color: #00ff00; 
+            padding: 15px; width: 80%; font-size: 20px; text-align: center; margin-top: 20px;
+        }
+        .btn-mabar { 
+            background: #00ff00; color: #000; border: none; padding: 15px 30px; 
+            font-weight: bold; margin-top: 15px; cursor: pointer; width: 85%;
+        }
+        .status { margin-top: 20px; font-size: 14px; color: #ffeb3b; }
+    </style>
+</head>
+<body>
+
+    <div class="box-utama">
+        <h1>🃏 CARD GAME HOLLAND 🃏</h1>
+        <p>Robot Battle - Pilih Simbol & Masukkan Kode</p>
+
+        <div class="faksi-container">
+            <div class="kartu" onclick="setFaksi('♠', this)">♠</div>
+            <div class="kartu" onclick="setFaksi('♦', this)">♦</div>
+            <div class="kartu" onclick="setFaksi('♥', this)">♥</div>
+            <div class="kartu" onclick="setFaksi('♣', this)">♣</div>
+        </div>
+
+        <div id="pilihan-teks">PILIH SIMBOL ROBOTMU</div>
+
+        <hr style="border: 0.5px solid #333; margin: 25px 0;">
+
+        <input type="number" id="roomCode" class="input-room" placeholder="MASUKKAN KODE ROOM (Contoh: 1234)">
+        <br>
+        <button class="btn-mabar" onclick="mulaiMabar()">MULAI BATTLE ONLINE</button>
+
+        <div class="status" id="statusLog">STATUS: MENUNGGU INSTRUKSI MASTER</div>
+    </div>
+
+    <script>
+        let faksiTerpilih = "";
+
+        function setFaksi(simbol, elemen) {
+            faksiTerpilih = simbol;
+            // Reset warna semua kartu
+            document.querySelectorAll('.kartu').forEach(k => k.classList.remove('terpilih'));
+            // Kasih warna kartu yang diklik
+            elemen.classList.add('terpilih');
+            document.getElementById('pilihan-teks').innerText = "ROBOT TERPILIH: " + simbol;
+        }
+
+        function mulaiMabar() {
+            let kode = document.getElementById('roomCode').value;
+            
+            if (!faksiTerpilih) {
+                alert("Master! Pilih dulu simbol robotnya (♠/♦/♥/♣)!");
+                return;
+            }
+            if (!kode) {
+                alert("Masukkan Kode Room dulu biar bisa mabar!");
+                return;
+            }
+
+            document.getElementById('statusLog').innerText = "MENGHUBUNGKAN KE ROOM: " + kode + "...";
+            
+            // Simulasi Masuk Arena
+            setTimeout(() => {
+                alert("BERHASIL! Robot " + faksiTerpilih + " Master sudah masuk ke Room " + kode + ". Siap tempur!");
+                // Di sini nanti kita sambungkan ke sistem arena tempur yang sebenarnya
+            }, 1500);
+        }
+    </script>
+
+</body>
+</html>
