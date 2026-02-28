@@ -3,88 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CARD GAME HOLLAND - MAIN MENU</title>
+    <title>HOLLAND: HEADLESS CURSE</title>
     <style>
-        body { background: #000; color: #0f0; font-family: 'Courier New', monospace; text-align: center; padding: 20px; }
-        .menu-box { border: 3px double #0f0; padding: 30px; border-radius: 20px; max-width: 400px; margin: auto; background: #111; }
-        .btn-menu { 
-            display: block; width: 100%; padding: 15px; margin: 10px 0; 
-            background: #0f0; color: #000; border: none; font-weight: bold; 
-            font-size: 18px; cursor: pointer; text-transform: uppercase;
+        body { background: #000; color: #f00; font-family: 'Courier New', monospace; text-align: center; }
+        .stats { font-size: 20px; font-weight: bold; margin: 20px; color: #ffeb3b; }
+        .card-area { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 20px; }
+        .card { 
+            width: 60px; height: 90px; background: #222; border: 2px solid #f00; 
+            border-radius: 5px; display: flex; align-items: center; justify-content: center;
+            font-size: 24px; cursor: pointer; color: #fff;
         }
-        .btn-menu:hover { background: #fff; transform: scale(1.05); }
-        .hidden { display: none; }
-        .faksi-select { display: flex; justify-content: center; gap: 15px; margin: 20px 0; }
-        .kartu { border: 2px solid #0f0; padding: 10px; font-size: 30px; cursor: pointer; border-radius: 10px; }
-        .terpilih { background: #0f0; color: #000; }
-        input { background: #000; border: 1px solid #0f0; color: #0f0; padding: 10px; width: 80%; text-align: center; margin-bottom: 10px; }
+        .card.revealed { background: #fff; color: #000; }
+        .card.curse { background: #ff0000; color: #fff; animation: shake 0.5s; }
+        @keyframes shake { 0% {transform: translate(1px, 1px);} 50% {transform: translate(-2px, -2px);} 100% {transform: translate(1px, 1px);} }
     </style>
 </head>
 <body>
 
-    <div id="screen-menu" class="menu-box">
-        <h1>🃏 HOLLAND ARENA 🃏</h1>
-        <p>-- PROJECT OON V1 --</p>
-        <button class="btn-menu" onclick="showScreen('screen-select', 'single')">🕹️ SINGLE PLAYER</button>
-        <button class="btn-menu" onclick="showScreen('screen-select', 'multi')">🌐 MULTIPLAYER</button>
-        <button class="btn-menu" onclick="window.location.href='index.html'">🏠 KELUAR</button>
-    </div>
+    <h1>🃏 CARD GAME HOLLAND 🃏</h1>
+    <div class="stats">KARTU TERPENGGAL: <span id="curseCount">0</span>/3</div>
+    <p>Klik salah satu dari 10 kartu Master secara acak!</p>
 
-    <div id="screen-select" class="menu-box hidden">
-        <h2 id="mode-title">PILIH MODE</h2>
-        <div class="faksi-select">
-            <div class="kartu" onclick="pilih('♠', this)">♠</div>
-            <div class="kartu" onclick="pilih('♦', this)">♦</div>
-            <div class="kartu" onclick="pilih('♥', this)">♥</div>
-            <div class="kartu" onclick="pilih('♣', this)">♣</div>
-        </div>
-        
-        <div id="multiplayer-input" class="hidden">
-            <input type="number" id="roomCode" placeholder="MASUKKAN KODE ROOM">
-        </div>
-
-        <button class="btn-menu" onclick="gasMain()">🚀 MULAI BATTLE</button>
-        <button class="btn-menu" style="background: #555; color: #fff;" onclick="showScreen('screen-menu')">KEMBALI</button>
-    </div>
+    <div class="card-area" id="deck"></div>
 
     <script>
-        let modeAktif = "";
-        let faksiAktif = "";
+        let curses = 0;
+        const deckElement = document.getElementById('deck');
+        const symbols = ['♣', '♠', '♥', '♦', '💀']; // 💀 adalah Kepala Terpenggal
 
-        function showScreen(screenId, mode) {
-            document.getElementById('screen-menu').classList.add('hidden');
-            document.getElementById('screen-select').classList.add('hidden');
-            document.getElementById(screenId).classList.remove('hidden');
+        function createDeck() {
+            for (let i = 0; i < 10; i++) {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerText = '?';
+                // Tentukan secara acak apakah kartu ini kutukan atau bukan (20% peluang)
+                const isCurse = Math.random() < 0.2; 
+                const content = isCurse ? '💀' : symbols[Math.floor(Math.random() * 4)];
 
-            if (mode) {
-                modeAktif = mode;
-                document.getElementById('mode-title').innerText = mode === 'single' ? "MODE: SINGLE PLAYER" : "MODE: MULTIPLAYER";
-                
-                if (mode === 'multi') {
-                    document.getElementById('multiplayer-input').classList.remove('hidden');
-                } else {
-                    document.getElementById('multiplayer-input').classList.add('hidden');
-                }
+                card.onclick = function() {
+                    if (this.classList.contains('revealed') || curses >= 3) return;
+                    
+                    this.classList.add('revealed');
+                    this.innerText = content;
+
+                    if (content === '💀') {
+                        this.classList.add('curse');
+                        curses++;
+                        document.getElementById('curseCount').innerText = curses;
+                        if (curses >= 3) {
+                            setTimeout(() => alert("ROBOT MASTER HANCUR! KEPALA TERPENGGAL 3 KALI!"), 100);
+                        }
+                    }
+                };
+                deckElement.appendChild(card);
             }
         }
 
-        function pilih(simbol, el) {
-            faksiAktif = simbol;
-            document.querySelectorAll('.kartu').forEach(k => k.classList.remove('terpilih'));
-            el.classList.add('terpilih');
-        }
-
-        function gasMain() {
-            if (!faksiAktif) {
-                alert("Master! Pilih dulu simbol robot ♣ ♠ ♥ ♦!");
-                return;
-            }
-
-            let kode = document.getElementById('roomCode').value || "BOT";
-            
-            // PINDAH KE ARENA.HTML
-            window.location.href = "Arena.html?room=" + kode + "&faksi=" + faksiAktif + "&mode=" + modeAktif;
-        }
+        createDeck();
     </script>
 </body>
 </html>
