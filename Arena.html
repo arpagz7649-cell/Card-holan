@@ -3,71 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARENA HOLLAND - BATTLE START</title>
+    <title>HOLLAND: HEADLESS CURSE</title>
     <style>
-        body { background: #000; color: #0f0; font-family: 'Courier New', monospace; margin: 0; overflow: hidden; text-align: center; }
-        canvas { background: #111; border: 2px solid #0f0; display: block; margin: 10px auto; touch-action: none; }
-        .ui { padding: 10px; background: #222; font-weight: bold; }
-        .controls { position: fixed; bottom: 20px; width: 100%; display: flex; justify-content: center; gap: 20px; }
-        .btn-move { width: 60px; height: 60px; background: #0f0; color: #000; border: none; border-radius: 50%; font-weight: bold; }
+        body { background: #000; color: #f00; font-family: 'Courier New', monospace; text-align: center; }
+        .stats { font-size: 20px; font-weight: bold; margin: 20px; color: #ffeb3b; }
+        .card-area { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 20px; }
+        .card { 
+            width: 60px; height: 90px; background: #222; border: 2px solid #f00; 
+            border-radius: 5px; display: flex; align-items: center; justify-content: center;
+            font-size: 24px; cursor: pointer; color: #fff;
+        }
+        .card.revealed { background: #fff; color: #000; }
+        .card.curse { background: #ff0000; color: #fff; animation: shake 0.5s; }
+        @keyframes shake { 0% {transform: translate(1px, 1px);} 50% {transform: translate(-2px, -2px);} 100% {transform: translate(1px, 1px);} }
     </style>
 </head>
 <body>
 
-    <div class="ui">ARENA: <span id="roomDisplay">????</span> | ROBOT: <span id="robotDisplay">?</span></div>
-    
-    <canvas id="battleCanvas"></canvas>
+    <h1>🃏 CARD GAME HOLLAND 🃏</h1>
+    <div class="stats">KARTU TERPENGGAL: <span id="curseCount">0</span>/3</div>
+    <p>Klik salah satu dari 10 kartu Master secara acak!</p>
 
-    <div class="controls">
-        <button class="btn-move" onclick="move('up')">▲</button>
-        <button class="btn-move" onclick="move('left')">◀</button>
-        <button class="btn-move" onclick="move('down')">▼</button>
-        <button class="btn-move" onclick="move('right')">▶</button>
-    </div>
+    <div class="card-area" id="deck"></div>
 
     <script>
-        const canvas = document.getElementById("battleCanvas");
-        const ctx = canvas.getContext("2d");
-        canvas.width = window.innerWidth - 20;
-        canvas.height = 300;
+        let curses = 0;
+        const deckElement = document.getElementById('deck');
+        const symbols = ['♣', '♠', '♥', '♦', '💀']; // 💀 adalah Kepala Terpenggal
 
-        // Ambil data dari pilihan Master sebelumnya
-        const urlParams = new URLSearchParams(window.location.search);
-        const room = urlParams.get('room') || "OFFLINE";
-        const faksi = urlParams.get('faksi') || "♣";
+        function createDeck() {
+            for (let i = 0; i < 10; i++) {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerText = '?';
+                // Tentukan secara acak apakah kartu ini kutukan atau bukan (20% peluang)
+                const isCurse = Math.random() < 0.2; 
+                const content = isCurse ? '💀' : symbols[Math.floor(Math.random() * 4)];
 
-        document.getElementById('roomDisplay').innerText = room;
-        document.getElementById('robotDisplay').innerText = faksi;
+                card.onclick = function() {
+                    if (this.classList.contains('revealed') || curses >= 3) return;
+                    
+                    this.classList.add('revealed');
+                    this.innerText = content;
 
-        let player = { x: 50, y: 150, symbol: faksi, color: "#0f0" };
-        let enemy = { x: 250, y: 150, symbol: "?", color: "#f00" }; // Ini nanti data dari teman Master
-
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Gambar Player (Master)
-            ctx.fillStyle = player.color;
-            ctx.font = "30px Arial";
-            ctx.fillText(player.symbol, player.x, player.y);
-
-            // Gambar Lawan
-            ctx.fillStyle = enemy.color;
-            ctx.fillText(enemy.symbol, enemy.x, enemy.y);
-
-            requestAnimationFrame(draw);
+                    if (content === '💀') {
+                        this.classList.add('curse');
+                        curses++;
+                        document.getElementById('curseCount').innerText = curses;
+                        if (curses >= 3) {
+                            setTimeout(() => alert("ROBOT MASTER HANCUR! KEPALA TERPENGGAL 3 KALI!"), 100);
+                        }
+                    }
+                };
+                deckElement.appendChild(card);
+            }
         }
 
-        function move(dir) {
-            if(dir === 'up') player.y -= 10;
-            if(dir === 'down') player.y += 10;
-            if(dir === 'left') player.x -= 10;
-            if(dir === 'right') player.x += 10;
-            
-            // LOGIKA ONLINE: Di sini nanti kode untuk kirim posisi x & y ke teman Master via Firebase
-        }
-
-        draw();
+        createDeck();
     </script>
 </body>
 </html>
-
