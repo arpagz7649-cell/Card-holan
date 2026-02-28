@@ -3,86 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CARD GAME HOLLAND - ROBOT BATTLE</title>
+    <title>HOLLAND: HEADLESS CURSE</title>
     <style>
-        body { background: #050505; color: #00ff00; font-family: 'Courier New', monospace; text-align: center; padding: 20px; }
-        .box-utama { border: 2px solid #00ff00; padding: 20px; border-radius: 15px; background: #111; }
-        .faksi-container { display: flex; justify-content: center; gap: 10px; margin: 20px 0; }
-        .kartu { 
-            border: 1px solid #00ff00; padding: 10px; width: 60px; cursor: pointer; 
-            font-size: 30px; border-radius: 8px; transition: 0.3s;
+        body { background: #000; color: #f00; font-family: 'Courier New', monospace; text-align: center; }
+        .stats { font-size: 20px; font-weight: bold; margin: 20px; color: #ffeb3b; }
+        .card-area { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 20px; }
+        .card { 
+            width: 60px; height: 90px; background: #222; border: 2px solid #f00; 
+            border-radius: 5px; display: flex; align-items: center; justify-content: center;
+            font-size: 24px; cursor: pointer; color: #fff;
         }
-        .kartu:hover { background: #00ff00; color: #000; }
-        .terpilih { background: #fff; color: #000; border-color: #fff; transform: scale(1.1); }
-        
-        .input-room { 
-            background: #000; border: 1px solid #00ff00; color: #00ff00; 
-            padding: 15px; width: 80%; font-size: 20px; text-align: center; margin-top: 20px;
-        }
-        .btn-mabar { 
-            background: #00ff00; color: #000; border: none; padding: 15px 30px; 
-            font-weight: bold; margin-top: 15px; cursor: pointer; width: 85%;
-        }
-        .status { margin-top: 20px; font-size: 14px; color: #ffeb3b; }
+        .card.revealed { background: #fff; color: #000; }
+        .card.curse { background: #ff0000; color: #fff; animation: shake 0.5s; }
+        @keyframes shake { 0% {transform: translate(1px, 1px);} 50% {transform: translate(-2px, -2px);} 100% {transform: translate(1px, 1px);} }
     </style>
 </head>
 <body>
 
-    <div class="box-utama">
-        <h1>🃏 CARD GAME HOLLAND 🃏</h1>
-        <p>Robot Battle - Pilih Simbol & Masukkan Kode</p>
+    <h1>🃏 CARD GAME HOLLAND 🃏</h1>
+    <div class="stats">KARTU TERPENGGAL: <span id="curseCount">0</span>/3</div>
+    <p>Klik salah satu dari 10 kartu Master secara acak!</p>
 
-        <div class="faksi-container">
-            <div class="kartu" onclick="setFaksi('♠', this)">♠</div>
-            <div class="kartu" onclick="setFaksi('♦', this)">♦</div>
-            <div class="kartu" onclick="setFaksi('♥', this)">♥</div>
-            <div class="kartu" onclick="setFaksi('♣', this)">♣</div>
-        </div>
-
-        <div id="pilihan-teks">PILIH SIMBOL ROBOTMU</div>
-
-        <hr style="border: 0.5px solid #333; margin: 25px 0;">
-
-        <input type="number" id="roomCode" class="input-room" placeholder="MASUKKAN KODE ROOM (Contoh: 1234)">
-        <br>
-        <button class="btn-mabar" onclick="mulaiMabar()">MULAI BATTLE ONLINE</button>
-
-        <div class="status" id="statusLog">STATUS: MENUNGGU INSTRUKSI MASTER</div>
-    </div>
+    <div class="card-area" id="deck"></div>
 
     <script>
-        let faksiTerpilih = "";
+        let curses = 0;
+        const deckElement = document.getElementById('deck');
+        const symbols = ['♣', '♠', '♥', '♦', '💀']; // 💀 adalah Kepala Terpenggal
 
-        function setFaksi(simbol, elemen) {
-            faksiTerpilih = simbol;
-            // Reset warna semua kartu
-            document.querySelectorAll('.kartu').forEach(k => k.classList.remove('terpilih'));
-            // Kasih warna kartu yang diklik
-            elemen.classList.add('terpilih');
-            document.getElementById('pilihan-teks').innerText = "ROBOT TERPILIH: " + simbol;
+        function createDeck() {
+            for (let i = 0; i < 10; i++) {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerText = '?';
+                // Tentukan secara acak apakah kartu ini kutukan atau bukan (20% peluang)
+                const isCurse = Math.random() < 0.2; 
+                const content = isCurse ? '💀' : symbols[Math.floor(Math.random() * 4)];
+
+                card.onclick = function() {
+                    if (this.classList.contains('revealed') || curses >= 3) return;
+                    
+                    this.classList.add('revealed');
+                    this.innerText = content;
+
+                    if (content === '💀') {
+                        this.classList.add('curse');
+                        curses++;
+                        document.getElementById('curseCount').innerText = curses;
+                        if (curses >= 3) {
+                            setTimeout(() => alert("ROBOT MASTER HANCUR! KEPALA TERPENGGAL 3 KALI!"), 100);
+                        }
+                    }
+                };
+                deckElement.appendChild(card);
+            }
         }
 
-        function mulaiMabar() {
-            let kode = document.getElementById('roomCode').value;
-            
-            if (!faksiTerpilih) {
-                alert("Master! Pilih dulu simbol robotnya (♠/♦/♥/♣)!");
-                return;
-            }
-            if (!kode) {
-                alert("Masukkan Kode Room dulu biar bisa mabar!");
-                return;
-            }
-
-            document.getElementById('statusLog').innerText = "MENGHUBUNGKAN KE ROOM: " + kode + "...";
-            
-            // Simulasi Masuk Arena
-            setTimeout(() => {
-                alert("BERHASIL! Robot " + faksiTerpilih + " Master sudah masuk ke Room " + kode + ". Siap tempur!");
-                // Di sini nanti kita sambungkan ke sistem arena tempur yang sebenarnya
-            }, 1500);
-        }
+        createDeck();
     </script>
-
 </body>
 </html>
