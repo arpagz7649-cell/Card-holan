@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARENA HOLLAND - BATTLE START</title>
+    <style>
+        body { background: #000; color: #0f0; font-family: 'Courier New', monospace; margin: 0; overflow: hidden; text-align: center; }
+        canvas { background: #111; border: 2px solid #0f0; display: block; margin: 10px auto; touch-action: none; }
+        .ui { padding: 10px; background: #222; font-weight: bold; }
+        .controls { position: fixed; bottom: 20px; width: 100%; display: flex; justify-content: center; gap: 20px; }
+        .btn-move { width: 60px; height: 60px; background: #0f0; color: #000; border: none; border-radius: 50%; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="ui">ARENA: <span id="roomDisplay">????</span> | ROBOT: <span id="robotDisplay">?</span></div>
+    
+    <canvas id="battleCanvas"></canvas>
+
+    <div class="controls">
+        <button class="btn-move" onclick="move('up')">▲</button>
+        <button class="btn-move" onclick="move('left')">◀</button>
+        <button class="btn-move" onclick="move('down')">▼</button>
+        <button class="btn-move" onclick="move('right')">▶</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById("battleCanvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = window.innerWidth - 20;
+        canvas.height = 300;
+
+        // Ambil data dari pilihan Master sebelumnya
+        const urlParams = new URLSearchParams(window.location.search);
+        const room = urlParams.get('room') || "OFFLINE";
+        const faksi = urlParams.get('faksi') || "♣";
+
+        document.getElementById('roomDisplay').innerText = room;
+        document.getElementById('robotDisplay').innerText = faksi;
+
+        let player = { x: 50, y: 150, symbol: faksi, color: "#0f0" };
+        let enemy = { x: 250, y: 150, symbol: "?", color: "#f00" }; // Ini nanti data dari teman Master
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Gambar Player (Master)
+            ctx.fillStyle = player.color;
+            ctx.font = "30px Arial";
+            ctx.fillText(player.symbol, player.x, player.y);
+
+            // Gambar Lawan
+            ctx.fillStyle = enemy.color;
+            ctx.fillText(enemy.symbol, enemy.x, enemy.y);
+
+            requestAnimationFrame(draw);
+        }
+
+        function move(dir) {
+            if(dir === 'up') player.y -= 10;
+            if(dir === 'down') player.y += 10;
+            if(dir === 'left') player.x -= 10;
+            if(dir === 'right') player.x += 10;
+            
+            // LOGIKA ONLINE: Di sini nanti kode untuk kirim posisi x & y ke teman Master via Firebase
+        }
+
+        draw();
+    </script>
+</body>
+</html>
+
